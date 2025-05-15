@@ -47,9 +47,9 @@ Design a database for patient management, appointments, medical records, and bil
 
 # ER DIAGRAM SUBMISSION :
 ---
-STUDENT NAME : DIVYASHREE G
+STUDENT NAME : RAGUL S
 
-REGISTER NUMBER : 212223060062
+REGISTER NUMBER : 212222060184
 
 ## SCENARIO CHOSEN :
  Hospital ER Diagram
