@@ -34,7 +34,7 @@ END;
 - A new entry is added to the `employee_log` table each time a new record is inserted into the `employees` table.
 
 output
-
+```
 -- Create main table
 CREATE TABLE employees (
     emp_id NUMBER PRIMARY KEY,
@@ -60,7 +60,7 @@ BEGIN
     VALUES (:NEW.emp_id, :NEW.emp_name, :NEW.salary);
 END;
 
-
+```
 
 ---
 
@@ -73,7 +73,7 @@ END;
 - If an attempt is made to delete a record from `sensitive_data`, an error message is raised, e.g., `ERROR: Deletion not allowed on this table.`
 
 output
-
+```
 -- Create sensitive table
 CREATE TABLE sensitive_data (
     record_id NUMBER PRIMARY KEY,
@@ -87,7 +87,7 @@ FOR EACH ROW
 BEGIN
     RAISE_APPLICATION_ERROR(-20001, 'ERROR: Deletion not allowed on this table.');
 END;
-
+```
 
 ---
 
@@ -100,7 +100,7 @@ END;
 - The `last_modified` column in the `products` table is updated automatically to the current date and time when any record is updated.
 
 output 
-
+```
 -- Create table with timestamp column
 CREATE TABLE products (
     product_id NUMBER PRIMARY KEY,
@@ -116,7 +116,7 @@ FOR EACH ROW
 BEGIN
     :NEW.last_modified := CURRENT_TIMESTAMP;
 END;
-
+```
 
 ---
 
@@ -129,7 +129,7 @@ END;
 - The `audit_log` table will maintain a count of how many updates have been made to the `customer_orders` table.
 
 output 
-
+```
 -- Create table to be audited
 CREATE TABLE customer_orders (
     order_id NUMBER PRIMARY KEY,
@@ -154,7 +154,7 @@ BEGIN
     SET update_count = update_count + 1
     WHERE table_name = 'customer_orders';
 END;
-
+```
 
 ---
 
@@ -167,7 +167,7 @@ END;
 - If the inserted salary in the `employees` table is below the condition (e.g., salary < 3000), the insert operation is blocked, and an error message is raised, such as: `ERROR: Salary below minimum threshold.`
 
 output
-
+```
 -- Reusing the employees table
 
 -- Create trigger
@@ -180,6 +180,6 @@ BEGIN
     END IF;
 END;
 
-
+```
 ## RESULT
 Thus, the PL/SQL trigger programs were written and executed successfully.
