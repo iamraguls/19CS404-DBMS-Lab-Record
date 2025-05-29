@@ -33,6 +33,35 @@ END;
 **Expected Output:**
 - A new entry is added to the `employee_log` table each time a new record is inserted into the `employees` table.
 
+output
+
+-- Create main table
+CREATE TABLE employees (
+    emp_id NUMBER PRIMARY KEY,
+    emp_name VARCHAR2(100),
+    salary NUMBER
+);
+
+-- Create log table
+CREATE TABLE employee_log (
+    log_id NUMBER GENERATED ALWAYS AS IDENTITY,
+    emp_id NUMBER,
+    emp_name VARCHAR2(100),
+    salary NUMBER,
+    log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create trigger
+CREATE OR REPLACE TRIGGER trg_log_employee_insert
+AFTER INSERT ON employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO employee_log (emp_id, emp_name, salary)
+    VALUES (:NEW.emp_id, :NEW.emp_name, :NEW.salary);
+END;
+
+
+
 ---
 
 ## 2. Write a trigger to prevent deletion of records from a sensitive table.
@@ -42,6 +71,23 @@ END;
 
 **Expected Output:**
 - If an attempt is made to delete a record from `sensitive_data`, an error message is raised, e.g., `ERROR: Deletion not allowed on this table.`
+
+output
+
+-- Create sensitive table
+CREATE TABLE sensitive_data (
+    record_id NUMBER PRIMARY KEY,
+    info VARCHAR2(100)
+);
+
+-- Create trigger
+CREATE OR REPLACE TRIGGER trg_prevent_sensitive_delete
+BEFORE DELETE ON sensitive_data
+FOR EACH ROW
+BEGIN
+    RAISE_APPLICATION_ERROR(-20001, 'ERROR: Deletion not allowed on this table.');
+END;
+
 
 ---
 
@@ -53,6 +99,25 @@ END;
 **Expected Output:**
 - The `last_modified` column in the `products` table is updated automatically to the current date and time when any record is updated.
 
+output 
+
+-- Create table with timestamp column
+CREATE TABLE products (
+    product_id NUMBER PRIMARY KEY,
+    product_name VARCHAR2(100),
+    price NUMBER,
+    last_modified TIMESTAMP
+);
+
+-- Create trigger
+CREATE OR REPLACE TRIGGER trg_update_last_modified
+BEFORE UPDATE ON products
+FOR EACH ROW
+BEGIN
+    :NEW.last_modified := CURRENT_TIMESTAMP;
+END;
+
+
 ---
 
 ## 4. Write a trigger to keep track of the number of updates made to a table.
@@ -63,6 +128,34 @@ END;
 **Expected Output:**
 - The `audit_log` table will maintain a count of how many updates have been made to the `customer_orders` table.
 
+output 
+
+-- Create table to be audited
+CREATE TABLE customer_orders (
+    order_id NUMBER PRIMARY KEY,
+    customer_name VARCHAR2(100),
+    order_total NUMBER
+);
+
+-- Create audit log table
+CREATE TABLE audit_log (
+    table_name VARCHAR2(50) PRIMARY KEY,
+    update_count NUMBER
+);
+
+-- Insert initial record
+INSERT INTO audit_log (table_name, update_count) VALUES ('customer_orders', 0);
+
+-- Create trigger
+CREATE OR REPLACE TRIGGER trg_count_updates
+AFTER UPDATE ON customer_orders
+BEGIN
+    UPDATE audit_log
+    SET update_count = update_count + 1
+    WHERE table_name = 'customer_orders';
+END;
+
+
 ---
 
 ## 5. Write a trigger that checks a condition before allowing insertion into a table.
@@ -72,6 +165,21 @@ END;
 
 **Expected Output:**
 - If the inserted salary in the `employees` table is below the condition (e.g., salary < 3000), the insert operation is blocked, and an error message is raised, such as: `ERROR: Salary below minimum threshold.`
+
+output
+
+-- Reusing the employees table
+
+-- Create trigger
+CREATE OR REPLACE TRIGGER trg_check_salary
+BEFORE INSERT ON employees
+FOR EACH ROW
+BEGIN
+    IF :NEW.salary < 3000 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'ERROR: Salary below minimum threshold.');
+    END IF;
+END;
+
 
 ## RESULT
 Thus, the PL/SQL trigger programs were written and executed successfully.
